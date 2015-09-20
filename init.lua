@@ -9,7 +9,7 @@ minetest.register_node("mineral_detector:detector", {
 	tile_images = {"mineral_detector_none_none_none.png", "default_steel_block.png"},
 	inventory_image = "mineral_detector_inv.png",
 	is_ground_content = true,
-	groups = {crumbly=3},
+	groups = {cracky=1, level=2},
 	drop = 'mineral_detector:detector 1',
 	metadata_name = "generic",
 	on_construct = function(pos)
@@ -62,8 +62,15 @@ function UpdateDetectorAll(pos, search_distance, search_item)
 	newmeta:set_string("search_item", search_item)
 end
 
+function UpdateMaterializerAll(pos, search_item)
+	info_text = ("Now producing "..search_item)
+	local newmeta = minetest.get_meta(pos)
+	newmeta:set_string("infotext",info_text)
+	newmeta:set_string("search_item", search_item)
+end
+
 minetest.register_on_punchnode(function(pos, node, puncher)
-	if string.match(node.name, "mineral_detector:") ~= nil then
+	if string.match(node.name, "mineral_detector:detector") ~= nil then
 
 		local meta = minetest.env:get_meta(pos)
 		local search_distance = tonumber(meta:get_string("search_distance"))
@@ -87,7 +94,57 @@ function(pos, newnode, placer)
 		if newnode.name == "mineral_detector:detector" then
 			UpdateDetectorAll(pos, min_search_distance, search_item)
 		end
+		if newnode.name == "mineral_detector:materializer" then
+			UpdateMaterializerAll(pos, search_item)
+		end
 	end
 end
 )
+
+-- Materializer
+
+minetest.register_node("mineral_detector:materializer", {
+	description = "Item Materializer",
+	tile_images = {"mineral_detector_none_none_none.png", "default_steel_block.png"},
+	inventory_image = "mineral_detector_inv.png",
+	is_ground_content = true,
+	groups = {cracky=1, level=2},
+	drop = 'mineral_detector:materializer 1',
+	metadata_name = "generic",
+	on_construct = function(pos)
+		--local n = minetest.get_node(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("formspec", "field[text;;${text}]")
+	end,
+	on_receive_fields = function(pos, formname, fields, sender)
+		local meta = minetest.get_meta(pos)
+		fields.text = fields.text or ""
+		if fields.text == "" then
+			return
+		end
+		UpdateMaterializerAll(pos, fields.text);
+	end
+})
+
+minetest.register_craft({
+	output = 'mineral_detector:materializer 1',
+	recipe = {
+		{'default:diamondblock', 'default:nyancat', 'default:diamondblock'},
+		{'default:diamondblock', 'default:nyancat', 'default:diamondblock'},
+		{'default:diamondblock', 'default:diamondblock', 'default:diamondblock'},
+	}
+})
+
+minetest.register_abm({
+	nodenames = {'mineral_detector:materializer'},
+	interval = 10.0,
+	chance = 1000.0,
+	action = function(pos)
+		local meta = minetest.get_meta(pos)
+		pos.y = pos.y+1
+		if minetest.registered_nodes[meta:get_string("search_item")] ~= nil then
+			minetest.add_node(pos,{name=meta:get_string("search_item")})
+		end
+	end,
+})
 
