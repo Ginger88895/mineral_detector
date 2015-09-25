@@ -84,7 +84,7 @@ function UpdateSensorAll(pos, search_item)
 	end
 	
 	if found > 0 then
-		info_text = ("Found " .. search_item .. " @ Distance" .. tostring(search_distance))
+		info_text = ("Found " .. search_item .. " @ Distance " .. tostring(dist))
 	else
 		info_text = (search_item .. "is not found nearby")
 	end
