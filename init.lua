@@ -38,8 +38,6 @@ minetest.register_craft({
 })
 
 function UpdateDetectorAll(pos, search_distance, search_item)
-	local search_p = {x=0, y=0, z=0}
-
 	local found = 0
 
 	for p_x=(pos.x-search_distance), (pos.x+search_distance) do
@@ -65,6 +63,31 @@ end
 function UpdateMaterializerAll(pos, search_item)
 	info_text = ("Now producing "..search_item)
 	local newmeta = minetest.get_meta(pos)
+	newmeta:set_string("infotext",info_text)
+	newmeta:set_string("search_item", search_item)
+end
+
+function UpdateSensorAll(pos, search_item)
+	local found = 0
+	local dist = 10000
+
+	for dx=-10,10 do
+		for dy=-10,10 do
+			for dz=-10,10 do
+				local search_n = minetest.env:get_node({x=pos.x+dx, y=pos.y+dy, z=pos.z+dz})
+				if search_n.name == search_item then
+					found = 1
+					dist = math.min(dist, math.max(math.abs(dx),math.abs(dy),math.abs(dz)))
+				end
+			end
+		end
+	end
+	
+	if found > 0 then
+		info_text = ("Found " .. search_item .. " @ Distance" .. tostring(search_distance))
+	else
+		info_text = (search_item .. "is not found nearby")
+	end
 	newmeta:set_string("infotext",info_text)
 	newmeta:set_string("search_item", search_item)
 end
@@ -195,3 +218,37 @@ minetest.register_abm({
 	end,
 })
 
+-- Mineral Sensor --
+--
+minetest.register_node("mineral_detector:sensor", {
+	description = "Mineral Sensor",
+	tile_images = {"mineral_sensor.png", "default_steel_block.png"},
+	inventory_image = "mineral_sensor.png",
+	is_ground_content = true,
+	groups = {cracky=1, level=2},
+	drop = 'mineral_detector:sensor 1',
+	metadata_name = "generic",
+	on_construct = function(pos)
+		--local n = minetest.get_node(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("formspec", "field[text;;${text}]")
+	end,
+	on_receive_fields = function(pos, formname, fields, sender)
+		local meta = minetest.get_meta(pos)
+		fields.text = fields.text or ""
+		if fields.text == "" then
+			return
+		end
+		meta:set_string("search_item", fields.text)
+		UpdateSensorAll(pos, meta:get_string("search_item"))
+	end
+})
+
+minetest.register_craft({
+	output = 'mineral_detector:sensor 1',
+	recipe = {
+		{'default:mese', 'default:steelblock', 'default:mese'},
+		{'default:mese', 'default:copperblock', 'default:mese'},
+		{'default:mese', 'default:steelblock', 'default:mese'},
+	}
+})
