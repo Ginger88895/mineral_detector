@@ -88,6 +88,8 @@ function UpdateSensorAll(pos, search_item)
 	else
 		info_text = (search_item .. "is not found nearby")
 	end
+
+	local newmeta = minetest.get_meta(pos)
 	newmeta:set_string("infotext",info_text)
 	newmeta:set_string("search_item", search_item)
 end
