@@ -157,8 +157,8 @@ minetest.register_node("mineral_detector:materializer", {
 minetest.register_craft({
 	output = 'mineral_detector:materializer 1',
 	recipe = {
-		{'default:diamondblock', 'default:nyancat', 'default:diamondblock'},
-		{'default:diamondblock', 'default:nyancat', 'default:diamondblock'},
+		{'default:diamondblock', 'default:obsidian 9', 'default:diamondblock'},
+		{'default:diamondblock', 'default:obsidian 9', 'default:diamondblock'},
 		{'default:diamondblock', 'default:diamondblock', 'default:diamondblock'},
 	}
 })
