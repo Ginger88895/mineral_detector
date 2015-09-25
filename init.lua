@@ -120,6 +120,9 @@ function(pos, newnode, placer)
 		if newnode.name == "mineral_detector:materializer" or newnode.name == "mineral_detector:materializer2" then
 			UpdateMaterializerAll(pos, search_item)
 		end
+		if newnode.name == "mineral_detector:sensor" then
+			UpdateSensorAll(pos, search_item)
+		end
 	end
 end
 )
@@ -160,8 +163,8 @@ minetest.register_craft({
 
 minetest.register_abm({
 	nodenames = {'mineral_detector:materializer'},
-	interval = 10.0,
-	chance = 1000.0,
+	interval = 10000.0,
+	chance = 1.0,
 	action = function(pos)
 		local meta = minetest.get_meta(pos)
 		pos.y = pos.y+1
@@ -207,8 +210,8 @@ minetest.register_craft({
 
 minetest.register_abm({
 	nodenames = {'mineral_detector:materializer2'},
-	interval = 10.0,
-	chance = 100.0,
+	interval = 1000.0,
+	chance = 1.0,
 	action = function(pos)
 		local meta = minetest.get_meta(pos)
 		pos.y = pos.y+1
