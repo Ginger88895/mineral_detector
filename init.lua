@@ -86,7 +86,7 @@ function UpdateSensorAll(pos, search_item)
 	if found > 0 then
 		info_text = ("Found " .. search_item .. " @ Distance " .. tostring(dist))
 	else
-		info_text = (search_item .. "is not found nearby")
+		info_text = (search_item .. " is not found nearby")
 	end
 
 	local newmeta = minetest.get_meta(pos)
